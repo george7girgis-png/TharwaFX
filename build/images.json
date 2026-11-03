@@ -75,6 +75,10 @@
   "aspect": "16:9",
   "prompt": "A floating faceted glass sphere on the right side of the frame with a bright glowing green neural core inside, thin orbiting rings of tiny holographic candlestick bars circling it. Tangled grey noisy price lines stream into the sphere from the far right and leave it as clean, bright green rising trend lines. Black void, fine floating particles, cinematic depth of field, the whole left half of the frame empty and dark for headline text."
  },
+ "home-uae": {
+  "aspect": "16:9",
+  "prompt": "Night view of the Dubai skyline seen from across the water on the right half of the frame, slender glass towers and the Burj Khalifa glowing softly, a vast translucent holographic AI trading display rising above the city: glowing green candlestick charts, a fine neural network of thin green filaments and bright nodes linking the towers, data streams reflecting in the calm water, the whole left half of the frame dark night sky and water for headline text."
+ },
  "cta-desert": {
   "aspect": "16:9",
   "prompt": "Sweeping desert sand dunes at dusk under a deep near-black sky, the dune crests catching a thin line of soft green light, gentle wind lifting fine sand, vast and calm, empty sky across the top half."

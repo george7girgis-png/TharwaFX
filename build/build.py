@@ -402,7 +402,7 @@ MARKET_ORDER = ["forex", "metals", "indices", "stocks", "commodities", "crypto"]
 def images(s, sid, lang):
     if sid == "P01":
         s = s.replace('#000 70%);border-bottom:1px solid #1e1e1e">',
-                      '#000 70%);border-bottom:1px solid #1e1e1e">' + media("home-ai-loop", "home-ai", "hero-img", eager=True), 1)
+                      '#000 70%);border-bottom:1px solid #1e1e1e">' + media("home-uae-v2", "home-uae-v2", "hero-img hero-v2", eager=True), 1)
         s = s.replace('<div style="border-bottom:1px solid #1e1e1e;padding:28px 0"><div class="wrap g5">', '<div class="stats"><div class="wrap g5">', 1)
         # The market board is frosted glass, so the globe shows through it.
         s = s.replace('<div><div class="row sb mb16"><b>', '<div class="glass-board"><div class="row sb mb16"><b>', 1)
@@ -502,6 +502,14 @@ def transform(main, sid, lang):
     s = images(s, sid, lang)
     s = glossary(s, base)
     s = results(s, base)
+    from editorial import enrich
+    s = enrich(s, base, lang, localize)
+    if base == 'P01':
+        from hero_slider import render
+        s = render(s, lang)
+    if base == 'P20' and lang == 'en':
+        from trading_preview import section
+        s = re.sub(r'<section\b.*?</section>', lambda _: section(), s, count=1, flags=re.S)
     # The book's absolute-size SVG illustrations scale on small screens.
     s = re.sub(r'<svg width="(\d+(?:\.\d+)?)" height="(\d+)"( viewBox="[^"]+")', r'<svg class="ill" width="\1" height="\2"\3', s)
     s = re.sub(r'<div class="tbl">(<table>.*?</table>)</div>', r'<div class="tbl"><div class="tscroll">\1</div></div>', s, flags=re.S)
@@ -749,16 +757,14 @@ def main():
     print(f"Built {len(index) + 2} pages and {apps} client-area screens into {OUT}")
 
 
-# Corners are 80% tighter than the book draws them: every px border-radius in the built CSS and inline
-# styles is scaled to a fifth. Percentages (circles) are left alone.
-RADIUS_SCALE = 0.2
-PILL_RADIUS = 4
+# One shared corner for UI surfaces, including book styles and inline markup.
+# Keep true circles, square edges and inherited corners intact.
 
 
 def soften_corners():
     def scale(m):
-        # Pills (40px and up) would still read as pills at a fifth, so they get the same small corner as cards.
-        vals = re.sub(r"(\d*\.?\d+)px", lambda v: f"{PILL_RADIUS if float(v.group(1)) >= 40 else float(v.group(1)) * RADIUS_SCALE:g}px", m.group(2))
+        vals = re.sub(r"(?<![\w.-])(\d*\.?\d+)(px|rem|em)\b",
+                      lambda v: 'var(--radius-ui)' if float(v.group(1)) else '0', m.group(2))
         return m.group(1) + vals
     pat = re.compile(r"(border(?:-(?:top|bottom|start|end)-(?:left|right|start|end))?-radius\s*:)([^;}\"]+)")
     for here, _, files in os.walk(OUT):
@@ -767,6 +773,12 @@ def soften_corners():
                 path = os.path.join(here, f)
                 text = open(path, encoding="utf-8").read()
                 new = pat.sub(scale, text)
+                if f.endswith('.html'):
+                    # Remove displayed asterisk markers, preserving scripts, styles and HTML attributes.
+                    parts = re.split(r'(<script\b.*?</script>|<style\b.*?</style>)', new, flags=re.S | re.I)
+                    for i in range(0, len(parts), 2):
+                        parts[i] = re.sub(r'>([^<>]*)<', lambda m: '>' + m.group(1).replace('*', '').replace('&ast;', '').replace('&#42;', '') + '<', parts[i])
+                    new = ''.join(parts)
                 if new != text:
                     open(path, "w", encoding="utf-8").write(new)
 

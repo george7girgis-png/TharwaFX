@@ -1,3 +1,5 @@
+// Shared visual playback speed; functional timers keep real-world timing.
+window.TFX_MOTION_RATE = 0.5;
 // TharwaFx public site: navigation, banners, toggles, forms, calculators,
 // glossary and search. No dependencies; every feature checks for its markup.
 (function () {
@@ -416,7 +418,7 @@
         void cells[i].offsetWidth;
         cells[i].classList.add(step > 0 ? "up" : "dn");
       });
-    }, 1400);
+    }, 1400 / window.TFX_MOTION_RATE);
   }
 
   // ---------------------------------------------------------------- glossary
@@ -680,10 +682,12 @@
   var clips = $$("video[data-ambient]");
   if (clips.length && !matchMedia("(prefers-reduced-motion: reduce)").matches && "IntersectionObserver" in window) {
     var start = function (v) {
+      if (document.hidden || v.closest('.hero-panel:not(.is-active)')) { v.pause(); return; }
       v.preload = "auto";
+      v.playbackRate = 1;
       var p = v.play();
       // A play() at page load can be refused before the clip is ready; try again once it can play.
-      if (p) p.catch(function () { v.addEventListener("canplay", function () { if (v.inView) v.play().catch(function () {}); }, { once: true }); });
+      if (p) p.catch(function () { v.addEventListener("canplay", function () { if (v.inView && !document.hidden && !v.closest('.hero-panel:not(.is-active)')) v.play().catch(function () {}); }, { once: true }); });
     };
     var watch = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
@@ -699,6 +703,10 @@
     });
     document.addEventListener("visibilitychange", function () {
       if (document.visibilityState === "visible") clips.forEach(function (v) { if (v.inView && v.paused) start(v); });
+      else clips.forEach(function (v) { v.pause(); });
+    });
+    document.addEventListener('tfx:herochange', function () {
+      clips.forEach(function (v) { if (v.inView) start(v); });
     });
   }
 
@@ -720,13 +728,13 @@
       var tx = li.querySelector(".tx");
       if (!animate) { tx.textContent = l.text; return; }
       li.classList.add("new");
-      var i = 0, typing = setInterval(function () { i += 2; tx.textContent = l.text.slice(0, i); if (i >= l.text.length) clearInterval(typing); }, 18);
+      var i = 0, typing = setInterval(function () { i += 2; tx.textContent = l.text.slice(0, i); if (i >= l.text.length) clearInterval(typing); }, 18 / window.TFX_MOTION_RATE);
     };
     feed.innerHTML = "";
     for (var k = 0; k < 5; k++) add(false);
     if (!still) {
-      setInterval(function () { if (document.visibilityState === "visible") add(true); }, 2200);
-      setInterval(function () { $$("[data-meter]").forEach(function (m) { m.style.width = (35 + Math.random() * 50).toFixed(0) + "%"; }); }, 1600);
+      setInterval(function () { if (document.visibilityState === "visible") add(true); }, 2200 / window.TFX_MOTION_RATE);
+      setInterval(function () { $$("[data-meter]").forEach(function (m) { m.style.setProperty("--m", (0.35 + Math.random() * 0.5).toFixed(2)); }); }, 1600 / window.TFX_MOTION_RATE);
     }
   }
 
@@ -801,7 +809,7 @@
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
         var t0 = performance.now();
         wipe.setAttribute("width", 0);
-        requestAnimationFrame(function grow(now) { var k = Math.min(1, (now - t0) / 1200); wipe.setAttribute("width", W * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(grow); });
+        requestAnimationFrame(function grow(now) { var k = Math.min(1, (now - t0) / (1200 / window.TFX_MOTION_RATE)); wipe.setAttribute("width", W * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(grow); });
       }
     };
     $$("input", sim).forEach(function (i) { i.addEventListener("input", run); });
@@ -870,7 +878,7 @@
       print();
       fillRight();
     };
-    setTimeout(function () { setInterval(tick, 1400); }, 2200);
+    setTimeout(function () { setInterval(tick, 1400 / window.TFX_MOTION_RATE); }, 2200 / window.TFX_MOTION_RATE);
   }
   // ---------------------------------------------------------------- home roadmap
   // The rail fills and the steps light up one by one the first time the roadmap scrolls into view.
@@ -878,5 +886,203 @@
     if (!("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) { road.classList.add("in"); return; }
     var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { road.classList.add("in"); io.disconnect(); } }); }, { threshold: 0.35 });
     io.observe(road);
+  });
+})();
+
+// Hero carousel: measured autoplay, with pause, focus and reduced-motion safeguards.
+(function () {
+  const deck = document.querySelector('[data-hero-deck]');
+  if (!deck) return;
+  const panels = Array.from(deck.querySelectorAll('.hero-panel'));
+  const buttons = Array.from(deck.querySelectorAll('[data-hero-go]'));
+  const status = deck.querySelector('[data-hero-status]');
+  const rtl = document.documentElement.dir === 'rtl';
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  let index = 0, touch, timer, paused = motion.matches, onscreen = true, transitions = [], transitionId = 0;
+  deck.classList.add('has-slide-motion');
+  function clearTransition() {
+    transitionId++;
+    transitions.forEach(animation => animation.cancel());
+    transitions = [];
+    panels.forEach(panel => panel.classList.remove('is-leaving'));
+  }
+  function schedule() {
+    clearTimeout(timer);
+    if (!paused && onscreen && !document.hidden)
+      // No wrap-around: autoplay heads back the way it came once it reaches the last slide.
+      timer = setTimeout(() => show(index === panels.length - 1 ? index - 1 : index + 1, false), 10000);
+  }
+  const prevArrow = deck.querySelector('[data-hero-prev]'), nextArrow = deck.querySelector('[data-hero-next]');
+  function show(next, announce = true) {
+    if (next < 0 || next >= panels.length) return;
+    const previous = panels[index];
+    const direction = (next > index ? 1 : -1) * (rtl ? -1 : 1);
+    clearTransition();
+    index = next;
+    // Only the arrow that leads somewhere stays live (and carries the light sweep).
+    prevArrow.disabled = index === 0;
+    nextArrow.disabled = index === panels.length - 1;
+    panels.forEach((panel, i) => {
+      const selected = i === index;
+      panel.hidden = false;
+      panel.classList.toggle('is-active', selected);
+      panel.setAttribute('aria-hidden', String(!selected));
+      panel.toggleAttribute('inert', !selected);
+      if (!selected) panel.querySelectorAll('video').forEach(video => video.pause());
+    });
+    buttons.forEach((button, i) => button.setAttribute('aria-current', String(i === index)));
+    const current = panels[index];
+    if (previous !== current && !motion.matches && current.animate) {
+      const id = transitionId;
+      previous.classList.add('is-leaving');
+      const options = {duration:650 / window.TFX_MOTION_RATE, easing:'cubic-bezier(.45,0,.2,1)'};
+      transitions = [
+        previous.animate([{translate:'0 0'}, {translate:`${-direction * 100}% 0`}], options),
+        current.animate([{translate:`${direction * 100}% 0`}, {translate:'0 0'}], options)
+      ];
+      Promise.allSettled(transitions.map(animation => animation.finished)).then(() => {
+        if (id !== transitionId) return;
+        previous.classList.remove('is-leaving');
+        transitions = [];
+      });
+    }
+    document.dispatchEvent(new Event('tfx:herochange'));
+    if (announce) status.textContent = panels[index].getAttribute('aria-label');
+    schedule();
+  }
+  deck.querySelector('[data-hero-controls]').hidden = false;
+  deck.querySelector('[data-hero-arrows]').hidden = false;
+  deck.addEventListener('focusin', event => {
+    if (!event.target.matches(':focus-visible')) return;
+    paused = true; schedule();
+  });
+  deck.addEventListener('focusout', event => {
+    if (!deck.contains(event.relatedTarget)) {paused = motion.matches; schedule();}
+  });
+  document.addEventListener('visibilitychange', schedule);
+  motion.addEventListener('change', () => {clearTransition(); paused=motion.matches; schedule();});
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(entries => {onscreen = entries[0].isIntersecting; schedule();}, {threshold:.25}).observe(deck);
+  }
+  addEventListener('pagehide', () => {clearTimeout(timer); clearTransition();});
+  addEventListener('pageshow', schedule);
+  buttons.forEach(button => button.addEventListener('click', () => show(Number(button.dataset.heroGo))));
+  // Keep focus on a live arrow when the clicked one becomes disabled at the end of the deck.
+  const step = by => { show(index + by); if (deck.contains(document.activeElement) || document.activeElement === document.body) (nextArrow.disabled ? prevArrow : nextArrow).focus({preventScroll:true}); };
+  prevArrow.addEventListener('click', () => step(-1));
+  nextArrow.addEventListener('click', () => step(1));
+  deck.addEventListener('keydown', event => {
+    if (!event.target.closest('.hero-controls,.hero-arrows') || !['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
+    event.preventDefault();
+    if (event.key === 'Home') show(0);
+    else if (event.key === 'End') show(panels.length - 1);
+    else show(index + ((event.key === 'ArrowRight') !== rtl ? 1 : -1));
+    (buttons[index] || (nextArrow.disabled ? prevArrow : nextArrow)).focus({preventScroll:true});
+  });
+  deck.addEventListener('pointerdown', event => {
+    if (event.pointerType !== 'touch' || event.target.closest('a,button,input,select,textarea')) return;
+    touch = {x:event.clientX,y:event.clientY,id:event.pointerId};
+  }, {passive:true});
+  deck.addEventListener('pointerup', event => {
+    if (!touch || touch.id !== event.pointerId) return;
+    const dx=event.clientX-touch.x,dy=event.clientY-touch.y;
+    touch = null;
+    if (Math.abs(dx)>55 && Math.abs(dx)>Math.abs(dy)*1.3) show(index + ((dx<0)!==rtl ? 1 : -1));
+  }, {passive:true});
+  deck.addEventListener('pointercancel', () => {touch=null;});
+  show(0, false);
+  schedule();
+})();
+
+// Arm below-the-fold entrances before scrolling; never replay already visible text.
+(function () {
+  'use strict';
+  const preference = matchMedia('(prefers-reduced-motion: reduce)');
+  const active = new Set(), visited = new WeakSet();
+  const pending = new Set();
+  let observer;
+  const easing = 'cubic-bezier(.25,.8,.25,1)';
+  function reveal(element, delay = 0) {
+    const show = () => {element.classList.remove('motion-pending'); pending.delete(element);};
+    if (preference.matches || visited.has(element) || !element.animate) {show(); return;}
+    visited.add(element);
+    // Never move focused controls or the contents of an open interactive panel.
+    if (element.contains(document.activeElement)) {show(); return;}
+    const animation = element.animate(
+      [{opacity:0, translate:'0 12px'}, {opacity:1, translate:'0 0'}],
+      {duration:520 / window.TFX_MOTION_RATE, delay, easing, fill:'backwards'}
+    );
+    show();
+    active.add(animation);
+    const clear = () => active.delete(animation);
+    animation.finished.then(clear, clear);
+  }
+  function setup() {
+    if (preference.matches || !('IntersectionObserver' in window)) return;
+    // Small editorial units only; keep prices, charts, forms and dashboards steady.
+    const selectors = [
+      'main h1', 'main section h2', '.hero .lead', '.hero .ai-pill',
+      '.stats .g5 > div', '.card.mkt', 'a.home-link', '.editorial-card',
+      '.vault-card', '.payment-logo', '.platform-copy', '.ai-card',
+      '.band-img', '.thumb.feat', '.ft .grid > div'
+    ];
+    const candidates = Array.from(document.querySelectorAll(selectors.join(',')))
+      .filter(element => !element.closest('.app, .auth, [data-terminal], .road-track, .hero-deck, .hero, .ai-hero') &&
+        !(element.matches('h2') && element.closest('.platform-copy')));
+    observer = new IntersectionObserver(entries => {
+      const entering = entries.filter(entry => entry.isIntersecting);
+      // Cap staggering, so a large grid never feels like a loading sequence.
+      entering.forEach((entry, index) => {
+        reveal(entry.target, Math.min(index % 4, 3) * 55 / window.TFX_MOTION_RATE);
+        observer.unobserve(entry.target);
+      });
+    }, {threshold:.08, rootMargin:'0px 0px -24px 0px'});
+    candidates.forEach(element => {
+      // Visible content is already painted. Animating it now causes a visible flash.
+      if (element.getBoundingClientRect().top < innerHeight) visited.add(element);
+      else if (!visited.has(element)) {
+        element.classList.add('motion-pending');
+        pending.add(element);
+        observer.observe(element);
+      }
+    });
+  }
+  const nav = document.querySelector('.nav');
+  let scheduled = false;
+  function updateHeader() {
+    if (scheduled || !nav) return;
+    scheduled = true;
+    requestAnimationFrame(() => {
+      nav.classList.toggle('is-scrolled', scrollY > 24);
+      scheduled = false;
+    });
+  }
+  addEventListener('scroll', updateHeader, {passive:true});
+  updateHeader(); setup();
+  // A keyboard jump must show its target immediately, even during a staggered reveal.
+  document.addEventListener('focusin', event => {
+    pending.forEach(element => {
+      if (element.contains(event.target)) {
+        element.classList.remove('motion-pending'); pending.delete(element); visited.add(element);
+      }
+    });
+    active.forEach(animation => {
+      const target = animation.effect && animation.effect.target;
+      if (target && target.contains(event.target)) animation.cancel();
+    });
+  });
+  preference.addEventListener('change', () => {
+    if (observer) observer.disconnect();
+    active.forEach(animation => animation.cancel());
+    active.clear();
+    pending.forEach(element => element.classList.remove('motion-pending'));
+    pending.clear();
+    if (!preference.matches) setup();
+  });
+  addEventListener('pagehide', () => {
+    active.forEach(animation => animation.cancel());
+    active.clear();
+    pending.forEach(element => element.classList.remove('motion-pending'));
+    pending.clear();
   });
 })();

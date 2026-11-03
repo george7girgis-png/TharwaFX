@@ -12,8 +12,8 @@ T = {
         "title": "Trade with AI",
         "desc": "AI tools for market analysis, news sentiment, risk management, automated trading and strategy backtesting, in Arabic and English.",
         "eyebrow": "TharwaFx AI",
-        "h1": "Trade with AI.",
-        "lead": "Five AI tools that read the market, weigh the news, guard your risk and trade your rules, while you stay in control of every limit.",
+        "h1": "A new dimension of market intelligence.",
+        "lead": "Explore AI-assisted market analysis, news sentiment and strategy testing. A wider perspective, with your decisions and risk limits at the centre.",
         "cta1": "Try AI on a demo", "cta2": "See automated trading",
         "note": "AI tools are in development and shown here as a preview*. Trading carries risk.",
         "console": "AI engine", "sample": "Sample activity",
@@ -168,12 +168,12 @@ def body(lang):
     controls = "".join(f'<div class="ctl"><b>{h}</b><p class="sm mut mt8">{p}</p></div>' for h, p in t["controls"])
     faq = "".join(f'<details class="faq"><summary>{q}</summary><p>{a}</p></details>' for q, a in t["faq"])
     lg = t["legend"]
-    return f'''<section class="ai-hero">{B.media("ai-core-loop", "ai-core", "ai-bg", eager=True)}<div class="ai-grid" aria-hidden="true"></div>
+    return f'''<section class="ai-hero ai-nexus-hero">{B.media("ai-candles-loop", "ai-candles", "ai-bg", eager=True)}<div class="ai-grid" aria-hidden="true"></div>
 <div class="wrap ai-hero-in"><div><span class="ai-eyebrow"><i></i>{t["eyebrow"]}</span><h1 class="mt24">{t["h1"]}</h1><p class="lead mt24">{t["lead"]}</p>
 <div class="row wr mt32"><a class="b p lg2" href="{L("/demo")}">{t["cta1"]}</a><a class="b o lg2" href="#auto">{t["cta2"]}</a></div><p class="xs mut3 mt16">{t["note"]}</p></div></div></section>
 
 <section class="ai-live"><div class="wrap"><div class="ai-console" role="img" aria-label="{t["sample"]}"><div class="row sb ai-console-h"><span class="row" style="gap:8px"><i class="live"></i><b class="mono sm">{t["console"]}</b></span><span class="xs mut3">{t["sample"]}</span></div>
-<ul class="ai-log" data-log>{log}</ul><div class="ai-meters"><div><span class="xs mut3">CPU</span><div class="bar"><i data-meter style="width:62%"></i></div></div><div><span class="xs mut3">{t["viz_risk"]}</span><div class="bar"><i data-meter style="width:48%"></i></div></div></div></div></div></section>
+<ul class="ai-log" data-log>{log}</ul><div class="ai-meters"><div><span class="xs mut3">CPU</span><div class="bar"><i data-meter style="--m:0.62"></i></div></div><div><span class="xs mut3">{t["viz_risk"]}</span><div class="bar"><i data-meter style="--m:0.48"></i></div></div></div></div></div></section>
 
 <section class="sec"><div class="wrap"><span class="mono k">{t["features_k"]}</span><h2 class="mt16">{t["features_h"]}</h2><div class="ai-bento mt48">{"".join(feats)}</div></div></section>
 
