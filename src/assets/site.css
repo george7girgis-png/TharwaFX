@@ -656,3 +656,11 @@ svg.viz .pulse{animation:pulse 1.6s ease-in-out infinite}
   .glass-board td:first-child,.glass-board th:first-child{padding-inline-start:10px}
   .glass-board td:nth-child(5),.glass-board th:nth-child(5){padding-inline-end:10px}
 }
+/* Phone hero: the globe sits behind the copy on narrow screens, so dim it, lift the lead text off it
+   and give the outlined demo button a dark glass fill. */
+@media (max-width:767px){
+  .hero-img{opacity:.5}
+  :has(>.hero-img) h1+.lead{color:#e4e4e4;text-shadow:0 1px 14px rgba(0,0,0,.95),0 0 2px rgba(0,0,0,.8)}
+  :has(>.hero-img) .row>.b.o{background:rgba(0,0,0,.62);border-color:rgba(255,255,255,.85);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+  :has(>.hero-img) h1+.lead~p{color:#c8c8c8;text-shadow:0 1px 10px rgba(0,0,0,.9)}
+}
