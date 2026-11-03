@@ -34,6 +34,8 @@ RAW = ROOT / "design" / "video-originals"
 # LTX-2.5 Fast is the cheaper fallback: python build/gen_videos.py --ltx
 KLING = "/kling-video/v4.0/image-to-video"
 LTX = "/lightricks/ltx-2.5/image-to-video/fast"
+# Kling 2.5 Turbo keeps fine detail (like on-screen UI) steadier: python build/gen_videos.py --k25 phone-loop
+K25 = "/kling-video/v2.5-turbo/pro/image-to-video"
 
 
 def still(name):
@@ -67,7 +69,7 @@ def web_loop(src, dst):
     ], check=True)
 
 
-def main(only, ltx=False):
+def main(only, ltx=False, k25=False):
     OUT.mkdir(parents=True, exist_ok=True)
     RAW.mkdir(parents=True, exist_ok=True)
     jobs = {}
@@ -78,9 +80,11 @@ def main(only, ltx=False):
         if ltx:
             body = {"prompt": prompt, "image_url": url, "duration": 6, "resolution": "720p", "generate_audio": False,
                     "aspect_ratio": "9:16" if image == "auth-panel" else "16:9", "camera_movement": "dolly_in"}
+        elif k25:
+            body = {"prompt": prompt, "image_url": url, "duration": 5}
         else:
             body = {"prompt": prompt, "image_url": url, "duration": 5, "resolution": "1080p", "sound": "off"}
-        status, text = call("POST", LTX if ltx else KLING, body)
+        status, text = call("POST", LTX if ltx else K25 if k25 else KLING, body)
         if status >= 300:
             print(f"{name}: submit failed {status}: {text[:300]}", flush=True)
             continue
@@ -105,4 +109,4 @@ def main(only, ltx=False):
 
 if __name__ == "__main__":
     args = set(sys.argv[1:])
-    main(args - {"--ltx"}, "--ltx" in args)
+    main(args - {"--ltx", "--k25"}, "--ltx" in args, "--k25" in args)

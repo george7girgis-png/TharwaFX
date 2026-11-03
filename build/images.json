@@ -55,6 +55,10 @@
   "aspect": "21:9",
   "prompt": "Contemporary dark collaborative workspace with long tables, laptops glowing, warm and green accent lighting, no visible faces."
  },
+ "home-ai": {
+  "aspect": "16:9",
+  "prompt": "A dark planet Earth on the right half of the frame made of millions of fine green light dots, wrapped in a delicate glowing neural lattice of thin green filaments and bright nodes, luminous arcs of light travelling between the Middle East and the world's financial centres, a soft green atmospheric rim light, deep space black, the whole left half of the frame empty and dark for headline text."
+ },
  "auth-panel": {
   "aspect": "3:4",
   "prompt": "Cinematic view of the Dubai skyline at blue hour from high above, slender glass towers fading into haze, thin green light trails of traffic far below, deep shadows, quiet and premium, empty dark sky in the upper half."

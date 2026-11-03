@@ -185,7 +185,7 @@ def header(lang, path):
     return f'''<a class="skip" href="#main">{t["skip"]}</a>
 <div class="risk">{t["risk"]}</div>
 <div class="top"><div class="wrap"><ul><li class="cur"><a href="{localize("/", lang)}">{t["traders"]}</a></li><li><a href="{localize("/partners", lang)}">{t["partners"]}</a></li></ul><ul><li class="hide-s"><a href="{localize("/platforms/webtrader", lang)}">WebTrader</a></li><li class="hide-s"><a href="{localize("/tools/calendar", lang)}">{t["cal"]}</a></li><li class="hide-s"><a href="{localize("/contact", lang)}">{t["contact"]}</a></li><li class="lang"><a href="{other}" hreflang="{"ar" if lang == "en" else "en"}" lang="{"ar" if lang == "en" else "en"}">{t["other"]}</a></li></ul></div></div>
-<header class="nav" id="nav"><div class="wrap"><a href="{localize("/", lang)}" aria-label="TharwaFx home">{logo()}</a><ul class="nav-l">{"".join(nav_items)}</ul><a class="srch" href="{localize("/search", lang)}" aria-label="{t["search"]}">{SEARCH_ICO}</a><div class="acts"><a class="b o sm" href="{localize("/login", lang)}">{t["login"]}</a><a class="b p sm" href="{localize("/register", lang)}">{t["open"]}</a></div><button type="button" class="burger" aria-expanded="false" aria-controls="drawer" aria-label="{t["menu"]}"><i></i><i></i><i></i></button></div>{"".join(panels)}<div class="drawer" id="drawer" hidden><div class="drawer-b">{"".join(drawer)}<div class="drawer-a"><a class="b o w" href="{localize("/login", lang)}">{t["login"]}</a><a class="b p w" href="{localize("/register", lang)}">{t["open"]}</a><a class="lk" href="{other}">{t["other"]}</a></div></div></div></header>'''
+<header class="nav" id="nav"><div class="wrap"><a href="{localize("/", lang)}" aria-label="TharwaFx home">{logo(24, 20, 15)}</a><ul class="nav-l">{"".join(nav_items)}</ul><a class="srch" href="{localize("/search", lang)}" aria-label="{t["search"]}">{SEARCH_ICO}</a><div class="acts"><a class="b o sm" href="{localize("/login", lang)}">{t["login"]}</a><a class="b p sm" href="{localize("/register", lang)}">{t["open"]}</a></div><button type="button" class="burger" aria-expanded="false" aria-controls="drawer" aria-label="{t["menu"]}"><i></i><i></i><i></i></button></div>{"".join(panels)}<div class="drawer" id="drawer" hidden><div class="drawer-b">{"".join(drawer)}<div class="drawer-a"><a class="b o w" href="{localize("/login", lang)}">{t["login"]}</a><a class="b p w" href="{localize("/register", lang)}">{t["open"]}</a><a class="lk" href="{other}">{t["other"]}</a></div></div></div></header>'''
 
 
 def footer(lang):
@@ -402,16 +402,18 @@ MARKET_ORDER = ["forex", "metals", "indices", "stocks", "commodities", "crypto"]
 def images(s, sid, lang):
     if sid == "P01":
         s = s.replace('#000 70%);border-bottom:1px solid #1e1e1e">',
-                      '#000 70%);border-bottom:1px solid #1e1e1e">' + media("hero-loop", "home-hero", "hero-img", eager=True), 1)
+                      '#000 70%);border-bottom:1px solid #1e1e1e">' + media("home-ai-loop", "home-ai", "hero-img", eager=True), 1)
         s = s.replace('<div style="border-bottom:1px solid #1e1e1e;padding:28px 0"><div class="wrap g5">', '<div class="stats"><div class="wrap g5">', 1)
+        # The market board is frosted glass, so the globe shows through it.
+        s = s.replace('<div><div class="row sb mb16"><b>', '<div class="glass-board"><div class="row sb mb16"><b>', 1)
         # The hero's way in to the AI page.
         new, label = ("جديد", "تداول بمساعدة الذكاء الاصطناعي") if lang == "ar" else ("New", "Trade with AI")
         pill = (f'<a class="ai-pill" href="{localize("/ai", lang)}"><span class="ai-dot"></span>{new}<b>{label}</b>'
                 '<span class="go" aria-hidden="true">→</span></a>')
         s = re.sub(r'<div><h1 style="font-size:\d+px">', lambda m: "<div>" + pill + m.group(0)[5:], s, count=1)
-        # The coded phone mockup stands on a lit plinth.
-        s = s.replace('<div><div class="phone" style="min-height:520px;width:300px;margin:0 auto">',
-                      '<div class="stage">' + media("platform-loop", "platform-stage", "stage-bg") + '<div class="phone" style="min-height:520px;width:300px;margin:0 auto">', 1)
+        # Platforms phone, roadmap, deposits and safety cards (build/home.py).
+        import home
+        s = home.redesign(s, lang)
         s += cta_band(lang)
         order = iter(MARKET_ORDER)
 
@@ -743,7 +745,30 @@ def main():
     json.dump(index, open(os.path.join(OUT, "assets", "search.json"), "w", encoding="utf-8"), ensure_ascii=False)
     json.dump({k: {"aspect": a, "prompt": p} for k, (a, p) in IMAGES.items()},
               open(os.path.join(ROOT, "build", "images.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    soften_corners()
     print(f"Built {len(index) + 2} pages and {apps} client-area screens into {OUT}")
+
+
+# Corners are 80% tighter than the book draws them: every px border-radius in the built CSS and inline
+# styles is scaled to a fifth. Percentages (circles) are left alone.
+RADIUS_SCALE = 0.2
+PILL_RADIUS = 4
+
+
+def soften_corners():
+    def scale(m):
+        # Pills (40px and up) would still read as pills at a fifth, so they get the same small corner as cards.
+        vals = re.sub(r"(\d*\.?\d+)px", lambda v: f"{PILL_RADIUS if float(v.group(1)) >= 40 else float(v.group(1)) * RADIUS_SCALE:g}px", m.group(2))
+        return m.group(1) + vals
+    pat = re.compile(r"(border(?:-(?:top|bottom|start|end)-(?:left|right|start|end))?-radius\s*:)([^;}\"]+)")
+    for here, _, files in os.walk(OUT):
+        for f in files:
+            if f.endswith((".css", ".html")):
+                path = os.path.join(here, f)
+                text = open(path, encoding="utf-8").read()
+                new = pat.sub(scale, text)
+                if new != text:
+                    open(path, "w", encoding="utf-8").write(new)
 
 
 if __name__ == "__main__":

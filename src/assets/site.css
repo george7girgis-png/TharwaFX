@@ -39,7 +39,7 @@ a.card,.card a.cover{color:inherit}
 .nav .nav-l{align-self:stretch}
 .nav-t{display:inline-flex;align-items:center;height:100%;font-weight:500;font-size:15px;color:#fff;transition:color .15s}
 .nav-t:hover,.nav li.on .nav-t,.nav-t[aria-expanded=true]{color:var(--g)}
-.nav-t[aria-expanded=true] .chev{transform:rotate(225deg) translateY(-2px)}
+.nav-t[aria-expanded=true] .chev{transform:translateY(2px) rotate(225deg)}
 .srch{color:var(--t2);display:flex;padding:8px}.srch:hover{color:#fff}
 .burger{display:none;width:44px;height:44px;flex-direction:column;justify-content:center;gap:5px;align-items:center;border-radius:12px}
 .burger i{display:block;width:20px;height:1.5px;background:#fff;transition:transform .2s,opacity .2s}
@@ -47,6 +47,7 @@ a.card,.card a.cover{color:inherit}
 .burger[aria-expanded=true] i:nth-child(2){opacity:0}
 .burger[aria-expanded=true] i:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
 .mega{position:absolute;inset:100% 0 auto;background:#050505;border-bottom:1px solid #1e1e1e;border-top:1px solid #1e1e1e;padding:32px 0 40px;box-shadow:0 24px 48px rgba(0,0,0,.6)}
+.nav .mega .wrap{display:block;height:auto}
 .mega-g{display:flex;gap:72px;flex-wrap:wrap}
 .nav .mega ul{display:block;font-size:15px;font-weight:400}
 .mega h5{font-size:13px;color:var(--t3);font-weight:600;margin-bottom:10px}
@@ -113,7 +114,10 @@ textarea.i{height:auto;min-height:120px;padding:14px 16px;resize:vertical;displa
 
 /* live board */
 .qt td.num{transition:color .4s}
-.qt td.up{color:var(--g)}.qt td.dn{color:var(--r)}
+/* Prices stay white; a tick flashes green or red for a moment, then fades back. */
+.qt td.num.up{animation:tick-up 1.2s ease-out}.qt td.num.dn{animation:tick-dn 1.2s ease-out}
+@keyframes tick-up{from{color:var(--g);background:rgba(52,232,52,.12)}}
+@keyframes tick-dn{from{color:var(--r);background:rgba(246,81,68,.12)}}
 
 /* layout scaling */
 svg.ill{height:auto}
@@ -157,7 +161,7 @@ svg.ill{height:auto}
   .risk{font-size:12px;padding:6px 16px}
   .top .hide-s{display:none}
   .nav .wrap{height:64px}
-  .nav .lg svg{width:28px;height:28px}.nav .wm{font-size:22px!important}.nav .lg .ar{font-size:17px!important}
+  .nav .lg svg{width:22px;height:22px}.nav .wm{font-size:18px!important}.nav .lg .ar{font-size:14px!important}
   .drawer{height:calc(100dvh - 64px)}
   .hero .wrap{padding-top:32px;padding-bottom:44px}
   .hero .mk{display:none}
@@ -508,3 +512,131 @@ svg.viz .pulse{animation:pulse 1.6s ease-in-out infinite}
   [dir=rtl] .ai-hero:after{background:linear-gradient(180deg,#000 calc(100% - 420px),rgba(0,0,0,0) calc(100% - 330px),rgba(0,0,0,0) calc(100% - 140px),#000 100%)}
   .ai-hero .ai-hero-in{padding-bottom:340px}
 }
+/* The home globe is a real map, so Arabic crops it to the left instead of mirroring it. */
+[dir=rtl] .hero-img{transform:none;right:42%;-webkit-mask-image:linear-gradient(270deg,transparent 10%,#000 60%);mask-image:linear-gradient(270deg,transparent 10%,#000 60%)}
+.qt td .row{flex-wrap:nowrap}
+/* Home hero: the market board is frosted glass over the AI globe. */
+.hero-img{opacity:.9}
+.glass-board{position:relative;padding:20px 22px 22px;border:1px solid rgba(255,255,255,.14);border-radius:22px;background:linear-gradient(155deg,rgba(255,255,255,.09),rgba(10,14,11,.5) 35%,rgba(6,9,7,.6));-webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 0 40px rgba(52,232,52,.04),0 30px 80px rgba(0,0,0,.4)}
+.glass-board .tbl{background:rgba(0,0,0,.18);border-color:rgba(255,255,255,.1)}
+.glass-board th,.glass-board td{border-color:rgba(255,255,255,.07)}
+.glass-board .tg.ol{background:rgba(0,0,0,.72);color:#fff;border-color:rgba(255,255,255,.28);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+@media (max-width:767px){.glass-board{padding:14px}}
+/* Live hero candles: rise in one after another, then the chart scrolls (site.js). */
+.ill.ticking .track{transition:transform 1.4s linear}
+.ill.ticking .cdl rect{transform-box:fill-box;transform-origin:50% 100%;animation:cdl-in .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0) * 14ms)}
+.ill.ticking .cdl.new rect{animation-duration:.9s;animation-delay:0s}
+.ill.ticking .cdl:last-child rect{filter:drop-shadow(0 0 4px #34E834)}
+@keyframes cdl-in{from{transform:scaleY(0);opacity:0}}
+
+/* ---------------------------------------------------------------- home redesigns (build/home.py) */
+/* Platforms: the 3D phone render, framed like a display case. */
+.phone3d{position:relative;aspect-ratio:3/4;border:1px solid #1f2a21;border-radius:24px;overflow:hidden;background:#050605;isolation:isolate}
+.phone3d .media img,.phone3d .media video{object-position:center 40%}
+.phone3d:after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(180deg,transparent 70%,rgba(0,0,0,.55));z-index:2}
+.phone3d-ring{position:absolute;inset:-1px;border-radius:inherit;z-index:3;pointer-events:none;padding:1px;background:conic-gradient(from var(--a,0deg),transparent 0 75%,rgba(52,232,52,.75) 85%,transparent 95%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:spin 8s linear infinite}
+.plat .card{background:linear-gradient(160deg,#0d0d0d,#070707);border-color:#1f1f1f;transition:border-color .3s,transform .3s,box-shadow .3s}
+.plat .card:hover{border-color:#2a4a2e;transform:translateY(-2px);box-shadow:0 0 30px rgba(52,232,52,.08)}
+
+/* Roadmap: a lit rail with four nodes; it fills as it scrolls into view and a pulse runs along it. */
+.road{position:relative;overflow:hidden;background:radial-gradient(900px 420px at 50% 100%,rgba(52,232,52,.08),transparent 70%)}
+.road-grid{position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(52,232,52,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(52,232,52,.05) 1px,transparent 1px);background-size:48px 48px;-webkit-mask-image:radial-gradient(60% 70% at 50% 60%,#000,transparent);mask-image:radial-gradient(60% 70% at 50% 60%,#000,transparent)}
+.road .wrap{position:relative}
+.road-wrap{position:relative;--node:64px}
+.road-rail{position:absolute;top:calc(var(--node) / 2);inset-inline:calc(12.5% - 2px);height:2px;background:#1c1c1c;border-radius:2px;overflow:hidden}
+.road-fill{position:absolute;inset-block:0;inset-inline-start:0;width:0;background:linear-gradient(90deg,#1c7a1c,var(--g));box-shadow:0 0 14px var(--g);transition:width 1.8s cubic-bezier(.4,0,.2,1)}
+[dir=rtl] .road-fill{background:linear-gradient(270deg,#1c7a1c,var(--g))}
+.road-wrap.in .road-fill{width:100%}
+.road-pulse{position:absolute;top:-3px;width:90px;height:8px;inset-inline-start:-90px;background:radial-gradient(closest-side,#fff,rgba(52,232,52,.8) 40%,transparent);filter:blur(1px);opacity:0}
+.road-wrap.in .road-pulse{animation:road-run 3.2s 1.8s linear infinite}
+@keyframes road-run{0%{inset-inline-start:-90px;opacity:0}10%{opacity:1}90%{opacity:1}100%{inset-inline-start:100%;opacity:0}}
+.road-track{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:20px;position:relative}
+.road-step{display:flex;flex-direction:column;align-items:center;text-align:center}
+.road-node{position:relative;width:var(--node);height:var(--node);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1px solid #2a2a2a;border-radius:16px;background:#070707;color:var(--t3);transform:rotate(45deg);transition:border-color .5s,color .5s,box-shadow .5s,background .5s;transition-delay:calc(var(--n) * .45s)}
+.road-node>*{transform:rotate(-45deg)}
+.road-node .mono{display:none}
+.road-wrap.in .road-node{border-color:var(--g);color:var(--g);box-shadow:0 0 0 6px rgba(52,232,52,.06),0 0 28px rgba(52,232,52,.35)}
+.road-wrap.in .road-step:last-child .road-node{background:var(--g);color:#000;box-shadow:0 0 0 8px rgba(52,232,52,.1),0 0 48px rgba(52,232,52,.6)}
+.road-card{position:relative;margin-top:32px;padding:26px 22px 24px;width:100%;border:1px solid #1d1d1d;border-radius:16px;background:linear-gradient(170deg,rgba(18,18,18,.9),rgba(6,6,6,.9));overflow:hidden;opacity:.35;transform:translateY(14px);transition:opacity .6s,transform .6s,border-color .6s;transition-delay:calc(var(--n) * .45s + .2s)}
+.road-card:before{content:"";position:absolute;top:0;inset-inline:20%;height:1px;background:linear-gradient(90deg,transparent,var(--g),transparent);opacity:.7}
+.road-wrap.in .road-card{opacity:1;transform:none}
+.road-step:last-child .road-card{border-color:#2a4a2e;background:linear-gradient(170deg,rgba(52,232,52,.1),rgba(6,6,6,.9) 60%)}
+.road-no{position:absolute;top:-14px;inset-inline-end:10px;font-size:84px;line-height:1;color:rgba(255,255,255,.035);font-weight:700;pointer-events:none}
+.road-card h3{font-size:24px}
+
+/* Deposits: methods slide past in a strip that fades out at both ends. */
+.pay{border-block:1px solid #1e1e1e;padding:36px 0;background:linear-gradient(90deg,rgba(52,232,52,.04),transparent 40%)}
+.pay-in{display:grid;grid-template-columns:auto 1fr;gap:48px;align-items:center}
+.pay-mq{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+.pay-track{display:flex;width:max-content;animation:pay-run 28s linear infinite}
+.pay-mq:hover .pay-track{animation-play-state:paused}
+[dir=rtl] .pay-track{animation-name:pay-run-rtl}
+.pay-dup{display:flex}
+@keyframes pay-run{to{transform:translateX(-50%)}}
+@keyframes pay-run-rtl{to{transform:translateX(50%)}}
+.pay-chip{display:inline-flex;align-items:center;gap:10px;margin-inline-end:12px;padding:12px 20px;border:1px solid #232323;border-radius:12px;background:linear-gradient(160deg,#111,#070707);font-weight:600;white-space:nowrap}
+.pay-chip i{width:6px;height:6px;border-radius:50%;background:var(--g);box-shadow:0 0 8px var(--g)}
+
+/* Safety: HUD-style cards with corner brackets and a scan line on hover. */
+.vault{position:relative}
+.vault-g{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.vault-card{position:relative;padding:28px;border:1px solid #1d1d1d;border-radius:16px;background:linear-gradient(170deg,#0c0c0c,#060606);overflow:hidden;transition:border-color .3s}
+.vault-card:before,.vault-card:after{content:"";position:absolute;width:18px;height:18px;border:2px solid var(--g);opacity:.7}
+.vault-card:before{top:10px;inset-inline-start:10px;border-inline-end:0;border-bottom:0}
+.vault-card:after{bottom:10px;inset-inline-end:10px;border-inline-start:0;border-top:0}
+.vault-card:hover{border-color:#2a4a2e}
+.vault-top{display:flex;align-items:center;justify-content:space-between}
+.vault-ico{display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border:1px solid #23402a;border-radius:14px;background:rgba(52,232,52,.07);color:var(--g);box-shadow:0 0 24px rgba(52,232,52,.12)}
+.vault-ico svg{width:24px!important;height:24px!important}
+.vault-scan{position:absolute;inset-inline:0;top:-40%;height:40%;background:linear-gradient(180deg,transparent,rgba(52,232,52,.08),transparent);pointer-events:none;opacity:0}
+.vault-card:hover .vault-scan{opacity:1;animation:scan 1.6s ease-in-out}
+@keyframes scan{to{top:100%}}
+
+@media (prefers-reduced-motion:reduce){.pay-track,.phone3d-ring,.road-wrap.in .road-pulse{animation:none}.road-card,.road-node,.road-fill{transition:none}}
+@media (max-width:991px){
+  .phone3d{max-width:420px;margin:32px auto 0}
+  .road-wrap{--node:52px}
+  .road-rail{top:0;bottom:0;inset-inline-start:calc(var(--node) / 2 - 1px);inset-inline-end:auto;width:2px;height:auto}
+  .road-fill{width:100%!important;height:0;transition:height 1.8s cubic-bezier(.4,0,.2,1);background:linear-gradient(180deg,#1c7a1c,var(--g))}
+  .road-wrap.in .road-fill{height:100%}
+  .road-pulse{display:none}
+  .road-track{grid-template-columns:1fr;gap:20px}
+  .road-step{flex-direction:row;align-items:flex-start;text-align:start;gap:20px}
+  .road-card{margin-top:0}
+  .pay-in{grid-template-columns:1fr;gap:20px}
+  .vault-g{grid-template-columns:1fr}
+}
+@media (max-width:991px){.road-node{flex:none;margin:10px;margin-inline-end:0}.road-rail{inset-inline-start:calc(var(--node) / 2 + 9px)}}
+
+/* Market board polish: room for the sparklines, quiet buttons, readable rows over the glow. */
+.glass-board .tbl{background:rgba(0,0,0,.22);border-color:rgba(255,255,255,.12)}
+.glass-board td,.glass-board th{padding-block:14px}
+.glass-board th{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--t3)}
+.qt td:nth-child(2),.qt th:nth-child(2){width:84px;min-width:84px}
+.qt td:nth-child(2) svg{width:70px;height:24px}
+.qt td.num{color:#fff;font-variant-numeric:tabular-nums}
+.qt .b.sell,.qt .b.buy{height:34px;min-width:58px;padding:0 14px;font-size:13px;font-weight:600}
+.qt .b.sell{background:transparent;color:var(--r);border:1px solid rgba(246,81,68,.45)}
+.qt .b.sell:hover{background:rgba(246,81,68,.14)}
+.qt .b.buy{background:var(--g);color:#000;border:1px solid var(--g)}
+.qt .b.buy:hover{background:#5cf05c}
+.glass-board tr:hover td{background:rgba(255,255,255,.03)}
+.glass-board td,.glass-board th{padding-inline:10px}
+.glass-board .qt td:nth-child(2),.glass-board .qt th:nth-child(2){width:66px;min-width:66px}
+.glass-board .qt td:nth-child(2) svg{width:56px}
+.glass-board .qt .b.sell,.glass-board .qt .b.buy{min-width:0;padding:0 12px}
+.nav .lg{gap:8px}.nav .lg .ar{padding-left:8px}
+.glass-board{border-color:rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 0 0 1px rgba(255,255,255,.03),0 30px 80px rgba(0,0,0,.35)}
+/* "Sample prices" tag: a quiet status label instead of a solid button-like block. */
+.glass-board .tg.ol{display:inline-flex;align-items:center;gap:8px;height:26px;padding:0 10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);color:var(--t2);font-family:GMono,monospace;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.glass-board .tg.ol:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--g);box-shadow:0 0 0 3px rgba(52,232,52,.15),0 0 8px var(--g)}
+[lang=ar] .glass-board .tg.ol{font-family:inherit;font-size:12px;letter-spacing:0}
+/* Header rhythm: logo centred on the same line as the menu and buttons, even gaps, steady chevrons. */
+.nav .wrap>a:first-child{display:flex;align-items:center;height:100%;margin-inline-end:16px}
+.nav .lg svg{width:24px;height:24px}
+.nav .chev{width:6px;height:6px;margin-inline-start:8px;transform:translateY(-2px) rotate(45deg);transition:transform .2s}
+.nav .nav-l{gap:30px}
+.nav .srch{margin-inline-end:4px}
+.nav .acts{gap:12px}
+.nav .acts .b{height:38px;padding:0 18px}
+@media (max-width:1279px){.nav .nav-l{gap:20px}.nav .wrap>a:first-child{margin-inline-end:4px}}

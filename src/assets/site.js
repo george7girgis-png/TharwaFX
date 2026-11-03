@@ -809,4 +809,60 @@
     sim.querySelector("[data-rerun]").addEventListener("click", function () { seed = Math.floor(Math.random() * 1e9); run(); });
     run();
   }
+  // ---------------------------------------------------------------- live hero candles
+  // The decorative candles under the home hero rise in, then scroll like a live chart:
+  // every tick the chart slides one candle left and a new random candle is printed on the right.
+  var ill = $(".hero-img") && $(".hero-img").parentNode.querySelector("svg.ill");
+  if (ill && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    var SVGNS = "http://www.w3.org/2000/svg", GREEN = "#34E834", RED = "#F65144";
+    var rects = $$("rect", ill), track = document.createElementNS(SVGNS, "g");
+    track.setAttribute("class", "track");
+    ill.appendChild(track);
+    var candles = [];
+    for (var ci = 0; ci + 1 < rects.length; ci += 2) {
+      var wick = rects[ci], bod = rects[ci + 1], g = document.createElementNS(SVGNS, "g");
+      g.setAttribute("class", "cdl");
+      g.style.setProperty("--i", candles.length);
+      g.appendChild(wick); g.appendChild(bod); track.appendChild(g);
+      candles.push(g);
+    }
+    ill.classList.add("ticking");
+    var num = function (el, a) { return parseFloat(el.getAttribute(a)); };
+    var step = candles.length > 1 ? num(candles[1].lastChild, "x") - num(candles[0].lastChild, "x") : 13;
+    var closeOf = function (g) { var b = g.lastChild, y = num(b, "y"), h = num(b, "height"); return b.getAttribute("fill") === GREEN ? y : y + h; };
+    var ys = candles.map(function (g) { return num(g.lastChild, "y"); });
+    var lo = Math.min.apply(null, ys), hi = Math.max.apply(null, ys) + 20, mid = (lo + hi) / 2;
+    var offset = 0, last = closeOf(candles[candles.length - 1]);
+    var print = function () {
+      var prev = candles[candles.length - 1], x = num(prev.lastChild, "x") + step;
+      var open = last, close = open + (Math.random() - 0.5) * 16 + (mid - open) * 0.06;
+      close = Math.max(lo, Math.min(hi, close));
+      var top = Math.min(open, close), h = Math.max(1.5, Math.abs(close - open));
+      var wTop = top - Math.random() * 7, wH = h + (top - wTop) + Math.random() * 7;
+      var g = document.createElementNS(SVGNS, "g"), w = document.createElementNS(SVGNS, "rect"), b = document.createElementNS(SVGNS, "rect");
+      var fill = close <= open ? GREEN : RED;
+      w.setAttribute("x", (x + 3).toFixed(1)); w.setAttribute("y", wTop.toFixed(1)); w.setAttribute("width", "1.2"); w.setAttribute("height", wH.toFixed(1)); w.setAttribute("fill", fill);
+      b.setAttribute("x", x.toFixed(1)); b.setAttribute("y", top.toFixed(1)); b.setAttribute("width", "7.2"); b.setAttribute("height", h.toFixed(1)); b.setAttribute("fill", fill);
+      g.setAttribute("class", "cdl new");
+      g.appendChild(w); g.appendChild(b); track.appendChild(g);
+      candles.push(g);
+      last = close;
+      // Drop candles that have scrolled off the left edge.
+      while (candles.length && num(candles[0].lastChild, "x") + 10 < offset) track.removeChild(candles.shift());
+    };
+    var tick = function () {
+      if (document.visibilityState !== "visible") return;
+      offset += step;
+      track.style.transform = "translateX(" + (-offset) + "px)";
+      print();
+    };
+    setTimeout(function () { setInterval(tick, 1400); }, 2200);
+  }
+  // ---------------------------------------------------------------- home roadmap
+  // The rail fills and the steps light up one by one the first time the roadmap scrolls into view.
+  $$("[data-road]").forEach(function (road) {
+    if (!("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) { road.classList.add("in"); return; }
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { road.classList.add("in"); io.disconnect(); } }); }, { threshold: 0.35 });
+    io.observe(road);
+  });
 })();
