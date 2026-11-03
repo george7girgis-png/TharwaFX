@@ -850,11 +850,25 @@
       // Drop candles that have scrolled off the left edge.
       while (candles.length && num(candles[0].lastChild, "x") + 10 < offset) track.removeChild(candles.shift());
     };
+    // The svg spans the full hero, so on screens wider than the 1440 artwork the viewBox widens to match
+    // and extra candles are printed out to the right edge.
+    var VB_H = 300, vbW = 1440;
+    var fillRight = function () { while (num(candles[candles.length - 1].lastChild, "x") < offset + vbW - step) print(); };
+    var fit = function () {
+      var r = ill.getBoundingClientRect();
+      if (!r.height) return;
+      vbW = Math.max(1440, Math.round(VB_H * r.width / r.height));
+      ill.setAttribute("viewBox", "0 0 " + vbW + " " + VB_H);
+      fillRight();
+    };
+    fit();
+    addEventListener("resize", fit);
     var tick = function () {
       if (document.visibilityState !== "visible") return;
       offset += step;
       track.style.transform = "translateX(" + (-offset) + "px)";
       print();
+      fillRight();
     };
     setTimeout(function () { setInterval(tick, 1400); }, 2200);
   }

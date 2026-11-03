@@ -523,6 +523,7 @@ svg.viz .pulse{animation:pulse 1.6s ease-in-out infinite}
 .glass-board .tg.ol{background:rgba(0,0,0,.72);color:#fff;border-color:rgba(255,255,255,.28);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 @media (max-width:767px){.glass-board{padding:14px}}
 /* Live hero candles: rise in one after another, then the chart scrolls (site.js). */
+.ill.ticking{width:100%;max-width:none;height:auto;aspect-ratio:1440/300;max-height:300px}
 .ill.ticking .track{transition:transform 1.4s linear}
 .ill.ticking .cdl rect{transform-box:fill-box;transform-origin:50% 100%;animation:cdl-in .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0) * 14ms)}
 .ill.ticking .cdl.new rect{animation-duration:.9s;animation-delay:0s}
