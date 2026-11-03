@@ -924,3 +924,8 @@ main p{line-height:1.7}
 .glass-board .tbl{background:transparent;border-color:rgba(255,255,255,.14)}
 /* Continuously moving layers get their own compositor layer, so they glide without repainting the page. */
 .pay-track,.road-pulse,.road-fill,.vault-scan,.bar i[data-meter]{will-change:transform;backface-visibility:hidden}
+/* "Trade with AI" pill: the same near-clear glass and frame light as the hero's secondary buttons. */
+.ai-pill{position:relative;background:linear-gradient(160deg,rgba(255,255,255,.035),rgba(255,255,255,.005) 60%);border:1px solid rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.16);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);color:rgba(255,255,255,.7)}
+.ai-pill:hover{background:linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.02) 60%);border-color:rgba(255,255,255,.4);box-shadow:inset 0 1px 0 rgba(255,255,255,.16);color:#fff}
+.ai-pill:before{content:"";position:absolute;inset:-1px;padding:1px;border-radius:inherit;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.9) 50%,transparent 70%) no-repeat;background-size:300% 100%;background-position:120% 0;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:glass-glide 6s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.ai-pill:before{animation:none;opacity:0}}
