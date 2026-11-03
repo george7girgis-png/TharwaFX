@@ -472,7 +472,7 @@ window.TFX_MOTION_RATE = 0.5;
       if (lead) lead.textContent = hits.length + " " + L.results;
       results.innerHTML = hits.length ? hits.map(function (p) {
         return '<a href="' + p.u + '" style="display:block;padding:18px 0;border-bottom:1px solid var(--gr)"><div class="xs grn">' +
-          esc(p.u.split("/")[2] || "home") + '</div><b class="mt8" style="display:block">' + esc(p.t) + '</b><p class="sm mut mt8">' + esc(p.d) + "</p></a>";
+          esc(p.u.replace(/^.*?\/(en|ar)\//, "").split("/")[0] || "home") +'</div><b class="mt8" style="display:block">' + esc(p.t) + '</b><p class="sm mut mt8">' + esc(p.d) + "</p></a>";
       }).join("") : '<p class="mut">' + L.none + " “" + esc(q) + "”.</p>";
       $$("form[role=search] input").forEach(function (i) { i.value = q; });
     });
