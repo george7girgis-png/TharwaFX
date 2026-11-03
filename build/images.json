@@ -1,0 +1,78 @@
+{
+ "home-hero": {
+  "aspect": "16:9",
+  "prompt": "Abstract wide scene: a dotted world map globe on the right edge seen in the dark, thin glowing green candlestick chart lines rising across the frame, soft green horizon glow at the bottom, lots of empty black space on the left for headline text."
+ },
+ "market-forex": {
+  "aspect": "16:9",
+  "prompt": "Abstract macro of overlapping translucent currency symbol-free banknote textures and fine guilloche line patterns, lit in green, dark and moody."
+ },
+ "market-metals": {
+  "aspect": "16:9",
+  "prompt": "Stack of polished gold bullion bars on black glass, rim-lit with subtle green reflections, shallow depth of field."
+ },
+ "market-indices": {
+  "aspect": "16:9",
+  "prompt": "Night aerial view of a financial district skyline with glowing green light trails between towers, abstracted and dark."
+ },
+ "market-stocks": {
+  "aspect": "16:9",
+  "prompt": "Abstract close-up of a glowing market depth ladder made of thin light bars, receding into darkness, green accent light."
+ },
+ "market-commodities": {
+  "aspect": "16:9",
+  "prompt": "Oil refinery silhouette at night with green-tinted sodium lights and steam, cinematic, very dark."
+ },
+ "market-crypto": {
+  "aspect": "16:9",
+  "prompt": "Abstract network of glowing nodes and thin connecting lines in a dark void, green highlights, depth of field."
+ },
+ "video-first-order": {
+  "aspect": "16:9",
+  "prompt": "Close-up of a laptop keyboard and a dark trading chart on screen with a single green candle highlighted, shallow depth of field."
+ },
+ "video-stop-loss": {
+  "aspect": "16:9",
+  "prompt": "Abstract dark chart with a horizontal glowing red-orange line as a safety level beneath a green price line, minimal."
+ },
+ "video-deposit": {
+  "aspect": "16:9",
+  "prompt": "A contactless payment card on a dark desk next to a smartphone with a softly glowing green screen, minimal."
+ },
+ "video-install-mt5": {
+  "aspect": "16:9",
+  "prompt": "Dark desktop workstation with two monitors showing abstract candlestick charts, green ambient light, no readable text."
+ },
+ "blog-gold-dollar": {
+  "aspect": "16:9",
+  "prompt": "Gold coin and a dollar-green glow balanced on a dark scale, conceptual, dramatic lighting."
+ },
+ "about-office": {
+  "aspect": "21:9",
+  "prompt": "Modern dark office interior at night overlooking a Gulf city skyline (Dubai style), floor-to-ceiling windows, green accent lighting, empty desks."
+ },
+ "careers-team": {
+  "aspect": "21:9",
+  "prompt": "Contemporary dark collaborative workspace with long tables, laptops glowing, warm and green accent lighting, no visible faces."
+ },
+ "auth-panel": {
+  "aspect": "3:4",
+  "prompt": "Cinematic view of the Dubai skyline at blue hour from high above, slender glass towers fading into haze, thin green light trails of traffic far below, deep shadows, quiet and premium, empty dark sky in the upper half."
+ },
+ "platform-stage": {
+  "aspect": "3:4",
+  "prompt": "Low angle across a smooth, unbroken polished black stone desk at night, a soft pool of light on the empty surface in the centre, soft green rim light from behind, out-of-focus city lights bokeh through a tall window. Nothing on the desk: no objects, no holes, no devices, no screens."
+ },
+ "ai-hero": {
+  "aspect": "16:9",
+  "prompt": "Abstract futuristic visual: a translucent neural network of fine glowing green filaments and small bright nodes taking shape above a dark candlestick price chart, floating particles, shallow depth of field, a vast empty black area on the left half for headline text."
+ },
+ "ai-core": {
+  "aspect": "16:9",
+  "prompt": "A floating faceted glass sphere on the right side of the frame with a bright glowing green neural core inside, thin orbiting rings of tiny holographic candlestick bars circling it. Tangled grey noisy price lines stream into the sphere from the far right and leave it as clean, bright green rising trend lines. Black void, fine floating particles, cinematic depth of field, the whole left half of the frame empty and dark for headline text."
+ },
+ "cta-desert": {
+  "aspect": "16:9",
+  "prompt": "Sweeping desert sand dunes at dusk under a deep near-black sky, the dune crests catching a thin line of soft green light, gentle wind lifting fine sand, vast and calm, empty sky across the top half."
+ }
+}
