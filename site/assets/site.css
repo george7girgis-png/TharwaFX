@@ -641,3 +641,18 @@ svg.viz .pulse{animation:pulse 1.6s ease-in-out infinite}
 .nav .acts{gap:12px}
 .nav .acts .b{height:38px;padding:0 18px}
 @media (max-width:1279px){.nav .nav-l{gap:20px}.nav .wrap>a:first-child{margin-inline-end:4px}}
+/* Phone: the hero board fits the screen instead of scrolling: instrument, bid, ask and change only. */
+@media (max-width:767px){
+  .glass-board .tbl.qt table{min-width:0;width:100%;table-layout:auto}
+  .glass-board .qt th:nth-child(6),.glass-board .qt td:nth-child(6){display:none}
+  .glass-board td,.glass-board th{padding:12px 8px;font-size:13px;white-space:nowrap}
+  .glass-board th{font-size:10px}
+  .glass-board td:first-child,.glass-board th:first-child{padding-inline-start:12px}
+  .glass-board td:nth-child(5),.glass-board th:nth-child(5){padding-inline-end:12px}
+}
+@media (max-width:389px){
+  .glass-board td,.glass-board th{padding-inline:5px;font-size:12px}
+  .glass-board th{font-size:9px;letter-spacing:.02em}
+  .glass-board td:first-child,.glass-board th:first-child{padding-inline-start:10px}
+  .glass-board td:nth-child(5),.glass-board th:nth-child(5){padding-inline-end:10px}
+}
